@@ -115,7 +115,20 @@ body{background:#0b1a12;color:#e8f5e9;font-family:'Segoe UI',Tahoma,Arial,sans-s
 #journalClose{margin-top:16px;padding:10px 24px;border:1px solid rgba(255,255,255,0.2);border-radius:20px;background:transparent;color:#c8e6c9;cursor:pointer;width:100%}
 #mobileControls{position:fixed;inset:0;pointer-events:none;z-index:20;display:none}
 #mobileControls.visible{display:block}
-#joystickZone{position:absolute;bottom:30px;left:30px;width:120px;height:120px;border-radius:50%;background:rgba(6,22,12,0.45);border:2px solid rgba(129,199,132,0.3);pointer-events:auto}
-#joystickKnob{position:absolute;top:50%;left:50%;width:50px;height:50px;border-radius:50%;background:rgba(76,175,80,0.7);transform:translate(-50%,-50%);pointer-events:none}
-#camZone{position:absolute;bottom:30px;right:30px;width:140px;height:140px;border-radius:16px;background:rgba(6,22,12,0.25);border:1px dashed rgba(129,199,132,0.25);pointer-events:auto;display:flex;align-items:center;justify-content:center;font-size:0.75em;color:rgba(255,255,255,0.4)}
-@media(min-width:769px){#mobileControls.visible{display:none}}
+#joystickZone{position:absolute;bottom:24px;left:24px;width:116px;height:116px;border-radius:50%;background:rgba(6,22,12,0.45);border:2px solid rgba(129,199,132,0.3);pointer-events:auto;touch-action:none}
+#joystickKnob{position:absolute;top:50%;left:50%;width:46px;height:46px;border-radius:50%;background:rgba(76,175,80,0.7);transform:translate(-50%,-50%);pointer-events:none}
+#camZone{position:absolute;bottom:24px;right:100px;width:120px;height:120px;border-radius:16px;background:rgba(6,22,12,0.25);border:1px dashed rgba(129,199,132,0.25);pointer-events:auto;display:flex;align-items:center;justify-content:center;touch-action:none}
+#mobileActions{position:absolute;bottom:28px;right:220px;display:flex;gap:12px;pointer-events:auto}
+.mobAct{width:52px;height:52px;border-radius:50%;border:2px solid rgba(129,199,132,0.5);background:rgba(6,22,12,0.65);color:#fff;font-size:1.45em;cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:manipulation;user-select:none;-webkit-user-select:none;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.mobAct:active{background:rgba(76,175,80,0.55);border-color:#a5d6a7;transform:scale(0.94)}
+.mobActPrimary{width:62px;height:62px;border-color:#81c784;background:rgba(76,175,80,0.28);font-size:1.6em}
+@media(max-width:768px){
+  #mobileControls.visible{display:block}
+  #hud #controlsHint{display:none}
+}
+@media(max-width:480px){
+  #camZone{bottom:22px;right:240px;width:100px;height:100px}
+  #mobileActions{bottom:190px;right:12px;gap:10px}
+  .mobAct{width:46px;height:46px;font-size:1.25em}
+  .mobActPrimary{width:54px;height:54px;font-size:1.4em}
+}

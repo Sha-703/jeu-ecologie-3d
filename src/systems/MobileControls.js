@@ -1,96 +1,122 @@
 export class MobileControls {
-  constructor(onMove, onCamera) {
-    this.onMove = onMove;
-    this.onCamera = onCamera;
+  constructor() {
     this.moveVec = { x: 0, z: 0 };
     this.camDelta = 0;
-    this.active = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    // mobile si tactile OU si largeur <= 768px (tablette)
+    this.active =
+      ('ontouchstart' in window || navigator.maxTouchPoints > 0 || window.innerWidth <= 768);
 
     if (!this.active) return;
 
     document.getElementById('mobileControls')?.classList.add('visible');
+    document.getElementById('controlsHint')?.classList.add('hidden');
     this._setupJoystick();
     this._setupCameraZone();
   }
 
+  show() {
+    if (this.active) document.getElementById('mobileControls')?.classList.add('visible');
+  }
+
+  hide() {
+    document.getElementById('mobileControls')?.classList.remove('visible');
+    this.moveVec = { x: 0, z: 0 };
+    this.camDelta = 0;
+  }
+
+  /** Enregistre un bouton d'action présent dans le DOM (index.html). */
+  registerAction(id, onTrigger) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('pointerdown', e => {
+      e.preventDefault();
+      onTrigger();
+      el.setPointerCapture?.(e.pointerId);
+    });
+  }
+
+  // ---------------------------------------------------------------------
+  //  Joystick virtuel (mouvement)
+  // ---------------------------------------------------------------------
   _setupJoystick() {
     const zone = document.getElementById('joystickZone');
     const knob = document.getElementById('joystickKnob');
     if (!zone || !knob) return;
 
     let touchId = null;
-    const center = { x: 0, y: 0 };
-    const maxR = 45;
+    let center = { x: 0, y: 0 };
+    const maxR = 46;
 
-    const handleStart = (e) => {
+    const reset = () => {
+      touchId = null;
+      knob.style.transform = 'translate(-50%, -50%)';
+      this.moveVec.x = 0;
+      this.moveVec.z = 0;
+    };
+
+    const process = (t) => {
+      let dx = t.clientX - center.x;
+      let dy = t.clientY - center.y;
+      const dist = Math.hypot(dx, dy);
+      if (dist > maxR) { dx = (dx / dist) * maxR; dy = (dy / dist) * maxR; }
+      knob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+      this.moveVec.x = dx / maxR;
+      this.moveVec.z = -dy / maxR;
+    };
+
+    zone.addEventListener('touchstart', e => {
       e.preventDefault();
       const t = e.changedTouches[0];
       touchId = t.identifier;
       const rect = zone.getBoundingClientRect();
-      center.x = rect.left + rect.width / 2;
-      center.y = rect.top + rect.height / 2;
-      this._updateKnob(t.clientX, t.clientY, knob, center, maxR);
-    };
+      center = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+      process(t);
+    }, { passive: false });
 
-    const handleMove = (e) => {
+    zone.addEventListener('touchmove', e => {
       e.preventDefault();
       for (const t of e.changedTouches) {
-        if (t.identifier === touchId) {
-          this._updateKnob(t.clientX, t.clientY, knob, center, maxR);
-        }
+        if (t.identifier === touchId) process(t);
       }
-    };
+    }, { passive: false });
 
-    const handleEnd = (e) => {
+    const endHandler = e => {
       for (const t of e.changedTouches) {
-        if (t.identifier === touchId) {
-          touchId = null;
-          knob.style.transform = 'translate(-50%, -50%)';
-          this.moveVec.x = 0;
-          this.moveVec.z = 0;
-        }
+        if (t.identifier === touchId) reset();
       }
     };
-
-    zone.addEventListener('touchstart', handleStart, { passive: false });
-    zone.addEventListener('touchmove', handleMove, { passive: false });
-    zone.addEventListener('touchend', handleEnd);
-    zone.addEventListener('touchcancel', handleEnd);
+    zone.addEventListener('touchend', endHandler);
+    zone.addEventListener('touchcancel', endHandler);
   }
 
-  _updateKnob(cx, cy, knob, center, maxR) {
-    let dx = cx - center.x;
-    let dy = cy - center.y;
-    const dist = Math.hypot(dx, dy);
-    if (dist > maxR) { dx = (dx / dist) * maxR; dy = (dy / dist) * maxR; }
-    knob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
-    this.moveVec.x = dx / maxR;
-    this.moveVec.z = -dy / maxR;
-  }
-
+  // ---------------------------------------------------------------------
+  //  Zone caméra (swipe horizontal pour tourner)
+  // ---------------------------------------------------------------------
   _setupCameraZone() {
     const zone = document.getElementById('camZone');
     if (!zone) return;
-    let lastX = 0;
-    let touchId = null;
 
-    zone.addEventListener('touchstart', (e) => {
+    let touchId = null;
+    let lastX = 0;
+
+    zone.addEventListener('touchstart', e => {
       e.preventDefault();
       touchId = e.changedTouches[0].identifier;
       lastX = e.changedTouches[0].clientX;
     }, { passive: false });
 
-    zone.addEventListener('touchmove', (e) => {
+    zone.addEventListener('touchmove', e => {
       e.preventDefault();
       for (const t of e.changedTouches) {
         if (t.identifier === touchId) {
-          this.camDelta = (t.clientX - lastX) * 0.008;
+          this.camDelta += (t.clientX - lastX) * 0.008;
           lastX = t.clientX;
         }
       }
     }, { passive: false });
 
     zone.addEventListener('touchend', () => { touchId = null; });
+    zone.addEventListener('touchcancel', () => { touchId = null; });
   }
 
   consumeCameraDelta() {

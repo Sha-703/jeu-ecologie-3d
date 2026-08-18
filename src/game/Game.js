@@ -90,16 +90,12 @@ export class Game {
     if (this.poi?.modalOpen) this.poi.closeModal();
     document.getElementById('journalPanel')?.classList.remove('visible');
     document.getElementById('tutorialOverlay')?.classList.remove('visible');
-    document.getElementById('mobileControls')?.classList.remove('visible');
+    if (this.mobile) this.mobile.hide();
     document.getElementById('npcHint')?.classList.remove('visible');
     document.getElementById('poacherReportHint')?.classList.remove('visible');
     document.getElementById('npcTalkHint')?.classList.remove('visible');
     this.npcs?.closeDialogue();
     this.minimap?.hide();
-    if (this.mobile) {
-      this.mobile.moveVec.x = 0;
-      this.mobile.moveVec.z = 0;
-    }
   }
 
   async _init() {
@@ -137,6 +133,26 @@ export class Game {
     });
 
     this.mobile = new MobileControls();
+    this.mobile.registerAction('mobInteractBtn', () => {
+      if (this.poi?.modalOpen || this.npcs?.dialogueOpen) {
+        this.poi?.closeModal();
+        this.npcs?.closeDialogue();
+        return;
+      }
+      this.poi?.tryInteract(this.env.current, this.journal, count => this.quests.onPoiDiscovered(count))
+        || this.npcs?.tryTalk(
+          this.player.mesh.position,
+          this.journal,
+          id => { this.quests.onNpcMet(id); this.audio.playDialogueBlip(); }
+        );
+    });
+    this.mobile.registerAction('mobReportBtn', () => {
+      if (!this.poi?.modalOpen && !this.npcs?.dialogueOpen) {
+        this.npcs?.tryReport(this.player.mesh.position, this.journal, this.animals, () => this.quests.onPoacherReported());
+      }
+    });
+    this.mobile.registerAction('mobJournalBtn', () => { this.journal.toggle(); this.quests.render(); });
+    this.mobile.registerAction('mobMapBtn',    () => this.minimap.toggle());
     this._bindInput();
     window.addEventListener('resize', () => this._onResize());
     this.initialized = true;
