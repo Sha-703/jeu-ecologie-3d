@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ÉcoExplorer — Jeu Éducatif 3D Écologie</title>
+<link rel="stylesheet" href="src/styles.css">
+</head>
+<body>
+
+<div id="startScreen">
+  <!-- Étape 1 : Connexion -->
+  <div id="stepLogin" class="onboardStep active">
+    <h1>ÉCOEXPLORER</h1>
+    <h2>Jeu éducatif 3D — Apprendre l'écologie par l'exploration</h2>
+    <p class="stepHint">Entre ton prénom pour commencer l'aventure</p>
+    <input id="playerNameInput" type="text" maxlength="24" placeholder="Ton prénom..." autocomplete="nickname">
+    <button id="loginBtn" onclick="goToCharacter()">Continuer</button>
+    <button id="resumeBtn" onclick="resumeExperience()" style="display:none;margin-top:12px;padding:12px 36px;font-size:1em;border:2px solid rgba(129,199,132,0.4);border-radius:30px;background:transparent;color:#a5d6a7;cursor:pointer">↩ Reprendre en tant que <span id="resumeName">—</span></button>
+  </div>
+
+  <!-- Étape 2 : Personnage -->
+  <div id="stepCharacter" class="onboardStep">
+    <h2>Bonjour, <span id="welcomeName">—</span> !</h2>
+    <p class="stepHint">Choisis ton explorateur</p>
+    <div id="charSelector">
+      <button class="charBtn" data-char="mpanzu" onclick="selectCharacter('mpanzu')">
+        <span class="charAvatar charBoy">👦</span>
+        <span class="char-title">Mpanzu</span>
+        <span class="char-desc">Garçon — curieux des forêts et de la biodiversité</span>
+      </button>
+      <button class="charBtn" data-char="nkenge" onclick="selectCharacter('nkenge')">
+        <span class="charAvatar charGirl">👧</span>
+        <span class="char-title">Nkenge</span>
+        <span class="char-desc">Fille — passionnée d'écologie et de protection de la nature</span>
+      </button>
+    </div>
+    <button id="charContinueBtn" onclick="goToEnv()">Choisir l'environnement</button>
+  </div>
+
+  <!-- Étape 3 : Environnement -->
+  <div id="stepEnv" class="onboardStep">
+    <h2>Où veux-tu explorer ?</h2>
+    <p class="stepHint">Quatre mondes vastes avec un horizon à perte de vue</p>
+    <div id="envSelector">
+      <button class="envBtn" data-env="forest" onclick="selectEnv('forest')">
+        <span class="env-title">🌲 Forêt</span>
+        <span class="env-desc">Biodiversité, canopée, cycle du carbone</span>
+      </button>
+      <button class="envBtn" data-env="city" onclick="selectEnv('city')">
+        <span class="env-title">🏙️ Ville</span>
+        <span class="env-desc">Pollution, espaces verts, urbanisme durable</span>
+      </button>
+      <button class="envBtn" data-env="aquatic" onclick="selectEnv('aquatic')">
+        <span class="env-title">💧 Aquatique</span>
+        <span class="env-desc">Écosystèmes d'eau douce, zones humides</span>
+      </button>
+      <button class="envBtn" data-env="savanna" onclick="selectEnv('savanna')">
+        <span class="env-title">🌾 Savane</span>
+        <span class="env-desc">Climat sec, adaptation, chaînes alimentaires</span>
+      </button>
+    </div>
+    <button id="startBtn" onclick="startExperience()">Commencer l'exploration</button>
+    <div class="footerHint">
+      WASD · Flèches · Espace · E : Signaler · M : Carte · J : Journal<br>
+      Quêtes, animaux, braconniers et badges !
+    </div>
+  </div>
+</div>
+
+<div id="hud">
+  <div class="panel panel-compact" id="playerPanel">
+    <div class="label">Explorateur</div>
+    <div class="value" id="playerNameDisplay">—</div>
+    <div class="subValue" id="playerCharDisplay">—</div>
+    <div class="subValue" id="playerBadgeCount" style="color:#ffd54f;margin-top:2px">0 badge</div>
+  </div>
+  <div class="panel panel-compact" id="envPanel">
+    <div class="label">Environnement</div>
+    <div class="value" id="envName">—</div>
+    <button id="quitBtn" type="button" title="Retour à la sélection">← Quitter</button>
+  </div>
+  <div class="panel panel-compact" id="weatherPanel">
+    <h3>Météo</h3>
+    <div class="fact" id="weatherFactBlock">
+      <strong id="weatherTitle">—</strong>
+      <span id="weatherFact">—</span>
+    </div>
+  </div>
+  <div class="panel panel-compact" id="ecoPanel">
+    <h3>Le saviez-vous ?</h3>
+    <div class="fact" id="ecoFact1"><strong>—</strong><span>—</span></div>
+  </div>
+  <div class="panel panel-compact" id="discoveryPanel">
+    <div class="label">Découvertes</div>
+    <div class="value" id="discoveryCount">0 / 0</div>
+    <button id="journalBtn" class="journalBtnInline" title="Journal (J)">📓 Journal</button>
+  </div>
+  <div class="panel panel-compact" id="questPanel">
+    <div class="label">Quêtes</div>
+    <div id="questList"></div>
+  </div>
+  <div id="controlsHint">WASD · Space : Interagir/Parler · E : Signaler · M : Carte · J : Journal</div>
+  <div id="interactHint">⏎ Espace — Interagir</div>
+  <div id="poacherReportHint">🛡️ E — Signaler le braconnier</div>
+  <div id="npcTalkHint">💬 Espace — Parler</div>
+  <div id="npcHint"></div>
+</div>
+
+<div id="minimapPanel">
+  <div class="minimapTitle">Carte (M)</div>
+  <canvas id="minimapCanvas"></canvas>
+  <div id="minimapLegend"></div>
+</div>
+
+<div id="badgeToast"></div>
+
+<div id="journalPanel">
+  <div class="journalContent">
+    <h2>📓 Journal de bord</h2>
+    <h3 style="color:#81c784;font-size:0.85em;margin-bottom:10px">Badges</h3>
+    <div id="badgeList"></div>
+    <h3 style="color:#81c784;font-size:0.85em;margin:16px 0 10px">Quêtes du biome</h3>
+    <div id="journalQuestList"></div>
+    <h3 style="color:#81c784;font-size:0.85em;margin:16px 0 10px">Historique</h3>
+    <div id="journalLog"></div>
+    <button id="journalClose">Fermer</button>
+  </div>
+</div>
+
+<div id="dialogueModal">
+  <div class="factModalContent dialogueContent">
+    <div class="factIcon" id="dialogueModalIcon" style="font-size:2.4em;margin-bottom:8px">👋</div>
+    <h2 id="dialogueModalTitle">—</h2>
+    <p id="dialogueModalQuote" class="dialogueQuote">—</p>
+    <div class="dialogueFactBox">
+      <strong>💡 Le saviez-vous ?</strong>
+      <p id="dialogueModalFact">—</p>
+    </div>
+    <button id="dialogueModalClose">Continuer</button>
+  </div>
+</div>
+
+<div id="factModal">
+  <div class="factModalContent">
+    <div class="discoveredBadge" style="display:inline-block;font-size:0.75em;background:rgba(255,213,79,0.15);color:#ffd54f;padding:4px 10px;border-radius:12px;margin-bottom:14px">✦ Nouvelle découverte</div>
+    <div class="factIcon" id="factModalIcon" style="font-size:2.4em;margin-bottom:8px">🌲</div>
+    <h2 id="factModalTitle">—</h2>
+    <p id="factModalDesc">—</p>
+    <button id="factModalClose">Continuer l'exploration</button>
+  </div>
+</div>
+
+<div id="tutorialOverlay">
+  <div class="tutorialBox">
+    <div class="stepIcon" id="tutorialIcon" style="font-size:3em;margin-bottom:12px">🌍</div>
+    <h3 id="tutorialTitle" style="color:#a5d6a7;margin-bottom:10px">Bienvenue</h3>
+    <p id="tutorialText" style="color:#c8e6c9;line-height:1.6;margin-bottom:20px">—</p>
+    <div style="height:4px;background:rgba(255,255,255,0.1);border-radius:2px;margin-bottom:16px"><div id="tutorialBarFill" style="height:100%;background:linear-gradient(90deg,#4caf50,#a5d6a7);width:0%"></div></div>
+    <div id="tutorialMeta" style="font-size:0.78em;opacity:0.5;margin-bottom:14px">Étape 1 / 5</div>
+    <button id="tutorialSkip" style="padding:10px 28px;border:1px solid rgba(255,255,255,0.2);border-radius:20px;background:transparent;color:#c8e6c9;cursor:pointer">Passer le tutoriel</button>
+  </div>
+</div>
+
+<div id="mobileControls">
+  <div id="joystickZone"><div id="joystickKnob"></div></div>
+  <div id="camZone">Caméra ↔</div>
+</div>
+
+<canvas id="gameCanvas"></canvas>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.157.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.157.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>
