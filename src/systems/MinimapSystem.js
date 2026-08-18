@@ -5,7 +5,7 @@ export class MinimapSystem {
     this.visible = false;
     this.canvas = document.getElementById('minimapCanvas');
     this.ctx = this.canvas?.getContext('2d');
-    this.size = 180;
+    this.size = 120;
     if (this.canvas) {
       this.canvas.width = this.size;
       this.canvas.height = this.size;

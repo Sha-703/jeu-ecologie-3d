@@ -139,12 +139,12 @@ export class Game {
         this.npcs?.closeDialogue();
         return;
       }
-      this.poi?.tryInteract(this.env.current, this.journal, count => this.quests.onPoiDiscovered(count))
-        || this.npcs?.tryTalk(
-          this.player.mesh.position,
-          this.journal,
-          id => { this.quests.onNpcMet(id); this.audio.playDialogueBlip(); }
-        );
+      // Priorité au dialogue PNJ si un personnage est talkable
+      this.npcs?.tryTalk(
+        this.player.mesh.position,
+        this.journal,
+        id => { this.quests.onNpcMet(id); this.audio.playDialogueBlip(); }
+      ) || this.poi?.tryInteract(this.env.current, this.journal, count => this.quests.onPoiDiscovered(count));
     });
     this.mobile.registerAction('mobReportBtn', () => {
       if (!this.poi?.modalOpen && !this.npcs?.dialogueOpen) {

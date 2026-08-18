@@ -1,5 +1,6 @@
 import { Game } from './game/Game.js';
 import { ProfileSystem } from './systems/ProfileSystem.js';
+import { CHARACTERS } from './config/data.js';
 
 const game = new Game();
 const profiles = new ProfileSystem();
@@ -105,3 +106,34 @@ document.getElementById('playerNameInput')?.addEventListener('input', () => {
 });
 
 applyProfileToUI();
+
+window.openProfile = () => {
+  const p = profiles.load();
+  document.getElementById('profileName').textContent = p.name || '—';
+  document.getElementById('profileChar').textContent = CHARACTERS[p.character]?.name || p.character || '—';
+  document.getElementById('profileIcon').textContent = p.character === 'nkenge' ? '👧' : '👦';
+  document.getElementById('profilePanel')?.classList.add('visible');
+};
+
+window.closeProfile = () => {
+  document.getElementById('profilePanel')?.classList.remove('visible');
+};
+
+window.disconnect = () => {
+  localStorage.removeItem('ecoexplorer_profile');
+  profile.name = '';
+  profile.character = 'mpanzu';
+  profile.lastEnv = 'forest';
+  game.returnToMenu();
+  document.getElementById('hud').style.display = 'none';
+  document.getElementById('profilePanel')?.classList.remove('visible');
+  document.getElementById('startScreen').classList.remove('hidden');
+  document.getElementById('playerNameInput').value = '';
+  document.getElementById('welcomeName').textContent = '—';
+  document.querySelectorAll('.charBtn').forEach(btn => btn.classList.remove('selected'));
+  showStep('stepLogin');
+};
+
+document.getElementById('profileClose')?.addEventListener('click', window.closeProfile);
+document.getElementById('profileDisconnect')?.addEventListener('click', window.disconnect);
+document.getElementById('mobProfileBtn')?.addEventListener('click', window.openProfile);

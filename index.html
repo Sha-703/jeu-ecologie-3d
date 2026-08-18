@@ -12,7 +12,7 @@
   <!-- Étape 1 : Connexion -->
   <div id="stepLogin" class="onboardStep active">
     <h1>ÉCOEXPLORER</h1>
-    <h2>Jeu éducatif 3D — Apprendre l'écologie par l'exploration</h2>
+    <h2>Jeu éducatif 3D <br>Apprendre l'écologie par l'exploration</h2>
     <p class="stepHint">Entre ton prénom pour commencer l'aventure</p>
     <input id="playerNameInput" type="text" maxlength="24" placeholder="Ton prénom..." autocomplete="nickname">
     <button id="loginBtn" onclick="goToCharacter()">Continuer</button>
@@ -164,12 +164,22 @@
 
 <div id="mobileControls">
   <div id="joystickZone"><div id="joystickKnob"></div></div>
-  </div>
   <div id="mobileActions">
     <button id="mobReportBtn" class="mobAct">🛡️</button>
     <button id="mobInteractBtn" class="mobAct mobActPrimary">⏎</button>
     <button id="mobJournalBtn" class="mobAct">📓</button>
     <button id="mobMapBtn"    class="mobAct">🗺️</button>
+    <button id="mobProfileBtn" class="mobAct">👤</button>
+  </div>
+</div>
+
+<div id="profilePanel">
+  <div class="profileBox">
+    <div class="profileIcon" id="profileIcon">👤</div>
+    <div class="profileName" id="profileName">—</div>
+    <div class="profileChar" id="profileChar">—</div>
+    <button id="profileDisconnect">Déconnexion</button>
+    <button id="profileClose" class="profileSecondary">Fermer</button>
   </div>
 </div>
 
