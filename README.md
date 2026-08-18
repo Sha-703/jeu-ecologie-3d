@@ -16,16 +16,22 @@ Jeu 3D d'exploration écologique avec 4 biomes, points interactifs, badges, mod�
 │   └── environments/       # EnvironmentBuilder
 ```
 
-## Lancement
-
-Ouvrir via **serveur local** (requis pour les modules ES et modèles GLTF) :
+## Lancement (développement)
 
 ```bash
-npx serve .
-# ou: python -m http.server 8080
+npm install
+npm run dev
 ```
 
-Puis ouvrir `http://localhost:3000` (ou le port affiché).
+Puis ouvrir l'adresse indiquée par Vite (par défaut http://localhost:5173).
+
+## Build & Production
+
+```bash
+npm run build
+```
+
+Le dossier prêt pour la production est `dist/`. Il peut être déployé sur n'importe quel hébergeur statique : GitHub Pages, Netlify, Vercel, hébergement OVH/FTP, etc.
 
 ## Contrôles
 
