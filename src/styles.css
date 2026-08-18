@@ -39,19 +39,19 @@ body{background:#0b1a12;color:#e8f5e9;font-family:'Segoe UI',Tahoma,Arial,sans-s
 #envPanel .value{font-size:1em;font-weight:700;color:#81c784}
 #quitBtn{margin-top:8px;pointer-events:auto;cursor:pointer;padding:5px 10px;border-radius:6px;border:1px solid rgba(239,83,80,0.35);background:rgba(239,83,80,0.12);color:#ef9a9a;font-size:0.68em;width:100%;font-weight:600;transition:background 0.2s,border-color 0.2s}
 #quitBtn:hover{background:rgba(239,83,80,0.25);border-color:rgba(239,83,80,0.55)}
-#weatherPanel{top:16px;right:16px;width:190px;max-width:calc(100vw - 32px)}
+#weatherPanel{top:16px;left:16px;width:190px;max-width:calc(100vw - 32px)}
 #weatherPanel h3{font-size:0.62em;opacity:0.55;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;color:#90caf9;font-weight:600}
 #weatherPanel .fact{font-size:0.72em;line-height:1.35;color:#c8e6c9}
 #weatherPanel .fact strong{color:#e8f5e9;display:block;font-size:0.95em;margin-bottom:3px;font-weight:600}
 #weatherPanel .fact span{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;opacity:0.88}
 #ecoPanel{top:16px;right:220px;width:190px;max-width:calc(100vw - 32px)}
-@media(max-width:480px){#ecoPanel{width:155px;top:120px;right:16px}#weatherPanel{width:155px}#envPanel{left:16px;top:72px}#minimapPanel{top:200px}}
+@media(max-width:480px){#ecoPanel{width:155px;top:120px;left:16px}#weatherPanel{width:155px}#envPanel{left:16px;top:72px}#minimapPanel{top:200px}}
 #ecoPanel h3{font-size:0.62em;opacity:0.55;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;color:#a5d6a7;font-weight:600}
 #ecoPanel .fact{font-size:0.72em;line-height:1.35;color:#c8e6c9}
 #ecoPanel .fact strong{color:#e8f5e9;display:block;font-size:0.95em;margin-bottom:3px;font-weight:600}
 #ecoPanel .fact span{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;opacity:0.88}
 #discoveryPanel{bottom:16px;left:16px;min-width:0}
-#questPanel{bottom:16px;right:16px;width:210px;max-width:calc(100vw - 32px);max-height:180px;overflow-y:auto}
+#questPanel{bottom:16px;left:16px;width:210px;max-width:calc(100vw - 32px);max-height:180px;overflow-y:auto}
 #questPanel .label{font-size:0.65em;opacity:0.55;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
 .questItem{display:flex;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.06);font-size:0.72em}
 .questItem.done{opacity:0.65}
@@ -75,12 +75,12 @@ body{background:#0b1a12;color:#e8f5e9;font-family:'Segoe UI',Tahoma,Arial,sans-s
 .dialogueFactBox p{color:#c8e6c9;font-size:0.9em;line-height:1.55;margin:0}
 #dialogueModalClose{padding:12px 32px;border:none;border-radius:24px;background:linear-gradient(135deg,#4caf50,#2e7d32);color:#fff;font-weight:600;cursor:pointer;width:100%}
 #resumeBtn:hover{background:rgba(76,175,80,0.15);border-color:#4caf50}
-#minimapPanel{position:fixed;top:110px;right:16px;width:196px;background:rgba(6,22,12,0.88);border:1px solid rgba(129,199,132,0.35);border-radius:12px;padding:10px;z-index:12;opacity:0;pointer-events:none;transition:opacity 0.25s}
+#minimapPanel{position:fixed;top:110px;left:16px;width:196px;background:rgba(6,22,12,0.88);border:1px solid rgba(129,199,132,0.35);border-radius:12px;padding:10px;z-index:12;opacity:0;pointer-events:none;transition:opacity 0.25s}
 #minimapPanel.visible{opacity:1}
 .minimapTitle{font-size:0.65em;text-transform:uppercase;letter-spacing:1px;color:#81c784;margin-bottom:6px;text-align:center}
 #minimapCanvas{display:block;margin:0 auto;border-radius:50%}
 #minimapLegend{display:flex;flex-wrap:wrap;gap:4px 8px;margin-top:8px;font-size:0.58em;opacity:0.7;justify-content:center}
-@media(max-width:480px){#questPanel{width:165px;bottom:60px}#minimapPanel{top:72px;right:16px;width:160px}}
+@media(max-width:480px){#questPanel{width:165px;bottom:60px}#minimapPanel{top:72px;left:16px;width:160px}}
 #discoveryPanel .label{font-size:0.65em;opacity:0.55;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px}
 #discoveryPanel .value{color:#ffd54f;font-weight:700;font-size:0.95em}
 .journalBtnInline{margin-top:6px;pointer-events:auto;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid rgba(129,199,132,0.3);background:rgba(76,175,80,0.12);color:#a5d6a7;font-size:0.68em;width:100%}
@@ -115,20 +115,29 @@ body{background:#0b1a12;color:#e8f5e9;font-family:'Segoe UI',Tahoma,Arial,sans-s
 #journalClose{margin-top:16px;padding:10px 24px;border:1px solid rgba(255,255,255,0.2);border-radius:20px;background:transparent;color:#c8e6c9;cursor:pointer;width:100%}
 #mobileControls{position:fixed;inset:0;pointer-events:none;z-index:20;display:none}
 #mobileControls.visible{display:block}
-#joystickZone{position:absolute;bottom:24px;left:24px;width:116px;height:116px;border-radius:50%;background:rgba(6,22,12,0.45);border:2px solid rgba(129,199,132,0.3);pointer-events:auto;touch-action:none}
-#joystickKnob{position:absolute;top:50%;left:50%;width:46px;height:46px;border-radius:50%;background:rgba(76,175,80,0.7);transform:translate(-50%,-50%);pointer-events:none}
-#camZone{position:absolute;bottom:24px;right:100px;width:120px;height:120px;border-radius:16px;background:rgba(6,22,12,0.25);border:1px dashed rgba(129,199,132,0.25);pointer-events:auto;display:flex;align-items:center;justify-content:center;touch-action:none}
-#mobileActions{position:absolute;bottom:28px;right:220px;display:flex;gap:12px;pointer-events:auto}
+#joystickZone{position:absolute;bottom:28px;right:184px;width:100px;height:100px;border-radius:50%;background:rgba(6,22,12,0.45);border:2px solid rgba(129,199,132,0.3);pointer-events:auto;touch-action:none}
+#joystickKnob{position:absolute;top:50%;left:50%;width:38px;height:38px;border-radius:50%;background:rgba(76,175,80,0.7);transform:translate(-50%,-50%);pointer-events:none}
+#mobileActions{position:absolute;bottom:28px;right:16px;display:flex;flex-direction:column;gap:12px;pointer-events:auto}
 .mobAct{width:52px;height:52px;border-radius:50%;border:2px solid rgba(129,199,132,0.5);background:rgba(6,22,12,0.65);color:#fff;font-size:1.45em;cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:manipulation;user-select:none;-webkit-user-select:none;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
 .mobAct:active{background:rgba(76,175,80,0.55);border-color:#a5d6a7;transform:scale(0.94)}
 .mobActPrimary{width:62px;height:62px;border-color:#81c784;background:rgba(76,175,80,0.28);font-size:1.6em}
 @media(max-width:768px){
   #mobileControls.visible{display:block}
   #hud #controlsHint{display:none}
+  /* Cache tous les panneaux HUD sur mobile */
+  #hud #playerPanel,
+  #hud #envPanel,
+  #hud #weatherPanel,
+  #hud #ecoPanel,
+  #hud #discoveryPanel,
+  #hud #questPanel{display:none!important}
+  #interactHint,
+  #npcHint,
+  #poacherReportHint,
+  #npcTalkHint{display:none!important}
 }
 @media(max-width:480px){
-  #camZone{bottom:22px;right:240px;width:100px;height:100px}
-  #mobileActions{bottom:190px;right:12px;gap:10px}
+  #mobileActions{bottom:24px;right:12px;gap:10px}
   .mobAct{width:46px;height:46px;font-size:1.25em}
   .mobActPrimary{width:54px;height:54px;font-size:1.4em}
 }

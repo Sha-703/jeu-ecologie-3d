@@ -2,7 +2,6 @@ export class MobileControls {
   constructor() {
     this.moveVec = { x: 0, z: 0 };
     this.camDelta = 0;
-    // mobile si tactile OU si largeur <= 768px (tablette)
     this.active =
       ('ontouchstart' in window || navigator.maxTouchPoints > 0 || window.innerWidth <= 768);
 
@@ -11,7 +10,6 @@ export class MobileControls {
     document.getElementById('mobileControls')?.classList.add('visible');
     document.getElementById('controlsHint')?.classList.add('hidden');
     this._setupJoystick();
-    this._setupCameraZone();
   }
 
   show() {
@@ -21,10 +19,8 @@ export class MobileControls {
   hide() {
     document.getElementById('mobileControls')?.classList.remove('visible');
     this.moveVec = { x: 0, z: 0 };
-    this.camDelta = 0;
   }
 
-  /** Enregistre un bouton d'action présent dans le DOM (index.html). */
   registerAction(id, onTrigger) {
     const el = document.getElementById(id);
     if (!el) return;
@@ -35,9 +31,6 @@ export class MobileControls {
     });
   }
 
-  // ---------------------------------------------------------------------
-  //  Joystick virtuel (mouvement)
-  // ---------------------------------------------------------------------
   _setupJoystick() {
     const zone = document.getElementById('joystickZone');
     const knob = document.getElementById('joystickKnob');
@@ -60,8 +53,9 @@ export class MobileControls {
       const dist = Math.hypot(dx, dy);
       if (dist > maxR) { dx = (dx / dist) * maxR; dy = (dy / dist) * maxR; }
       knob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
-      this.moveVec.x = dx / maxR;
-      this.moveVec.z = -dy / maxR;
+      // axe horizontal du joystick = rotation, vertical = avancer/reculer
+      this.moveVec.x = dx / maxR;   // rotation
+      this.moveVec.z = -dy / maxR;  // avancer/reculer
     };
 
     zone.addEventListener('touchstart', e => {
@@ -87,36 +81,6 @@ export class MobileControls {
     };
     zone.addEventListener('touchend', endHandler);
     zone.addEventListener('touchcancel', endHandler);
-  }
-
-  // ---------------------------------------------------------------------
-  //  Zone caméra (swipe horizontal pour tourner)
-  // ---------------------------------------------------------------------
-  _setupCameraZone() {
-    const zone = document.getElementById('camZone');
-    if (!zone) return;
-
-    let touchId = null;
-    let lastX = 0;
-
-    zone.addEventListener('touchstart', e => {
-      e.preventDefault();
-      touchId = e.changedTouches[0].identifier;
-      lastX = e.changedTouches[0].clientX;
-    }, { passive: false });
-
-    zone.addEventListener('touchmove', e => {
-      e.preventDefault();
-      for (const t of e.changedTouches) {
-        if (t.identifier === touchId) {
-          this.camDelta += (t.clientX - lastX) * 0.008;
-          lastX = t.clientX;
-        }
-      }
-    }, { passive: false });
-
-    zone.addEventListener('touchend', () => { touchId = null; });
-    zone.addEventListener('touchcancel', () => { touchId = null; });
   }
 
   consumeCameraDelta() {

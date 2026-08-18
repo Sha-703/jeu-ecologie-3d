@@ -374,8 +374,6 @@ export class Game {
 
     const turnSpeed = 2.2;
     let moveSpeed = this.inWater ? 2.2 : 4;
-    const camDelta = this.mobile?.consumeCameraDelta() || 0;
-    if (camDelta) this.cameraYaw -= camDelta;
     if (this.keys['arrowleft']) this.cameraYaw += turnSpeed * dt;
     if (this.keys['arrowright']) this.cameraYaw -= turnSpeed * dt;
 
@@ -384,10 +382,14 @@ export class Game {
 
     let mx = 0, mz = 0;
     const mv = this.mobile?.getMoveVector();
-    if (mv && (mv.x || mv.z)) { mx = mv.x; mz = mv.z; }
-    else {
-      if (this.keys['w'] || this.keys['arrowup']) { mx += cfX; mz += cfZ; }
-      if (this.keys['s'] || this.keys['arrowdown']) { mx -= cfX; mz -= cfZ; }
+    if (mv && (Math.abs(mv.x) > 0.08 || Math.abs(mv.z) > 0.08)) {
+      // Joystick mobile : vertical = avancer/reculer, horizontal = rotation
+      this.cameraYaw -= mv.x * turnSpeed * dt;
+      mx = mv.z * cfX;
+      mz = mv.z * cfZ;
+    } else {
+      if (this.keys['w'] || this.keys['arrowup'])    { mx += cfX; mz += cfZ; }
+      if (this.keys['s'] || this.keys['arrowdown'])  { mx -= cfX; mz -= cfZ; }
       if (this.keys['a']) { mx -= crX; mz -= crZ; }
       if (this.keys['d']) { mx += crX; mz += crZ; }
     }
