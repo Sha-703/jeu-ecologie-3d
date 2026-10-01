@@ -2,6 +2,15 @@ import { Game } from './game/Game.js';
 import { ProfileSystem } from './systems/ProfileSystem.js';
 import { CHARACTERS } from './config/data.js';
 
+// PWA : enregistre le service worker (offline + installable)
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch((err) => {
+      console.warn('[PWA] service worker non enregistré :', err);
+    });
+  });
+}
+
 const game = new Game();
 const profiles = new ProfileSystem();
 const profile = profiles.load();
