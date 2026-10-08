@@ -8,6 +8,13 @@ export class DayNightSystem {
     this.skyMesh = skyMesh;
     this.time = 0.35;
     this.cycleDuration = 90;
+    this.fogBase = new THREE.Color(0x87ceeb);
+  }
+
+  setFogBase(hex) {
+    // Teinte de brouillard du biome : le cycle jour/nuit la conserve
+    // au lieu de l'écraser (mélange 55/45)
+    this.fogBase.setHex(hex);
   }
 
   update(dt) {
@@ -30,6 +37,7 @@ export class DayNightSystem {
 
     this.scene.background.copy(sky);
     if (this.skyMesh) this.skyMesh.material.color.copy(sky);
-    if (this.scene.fog) this.scene.fog.color.copy(sky);
+    // Conserve l'identité du biome : mélange teinte locale + ciel
+    if (this.scene.fog) this.scene.fog.color.copy(this.fogBase).lerp(sky, 0.45);
   }
 }

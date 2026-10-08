@@ -19,7 +19,7 @@ export const CHARACTERS = {
   }
 };
 
-const INFINITE = { mapHalf: 280, terrainSize: 500, noBoundary: true, infinite: true };
+const INFINITE = { mapHalf: 240, terrainSize: 500, noBoundary: true, infinite: true };
 
 export const ENV_CONFIG = {
   forest: { name: 'Forêt', ...INFINITE, spread: 380, fog: 0.003, fogColor: 0x87ceeb },
@@ -93,7 +93,7 @@ export const QUEST_DATA = {
   ],
   city: [
     { id: 'city_poi', type: 'discover_poi', target: 3, icon: '✨', title: 'Écologie urbaine', desc: 'Découvre les 3 orbes lumineux.' },
-    { id: 'city_citizens', type: 'meet_npc', target: 3, icon: '👋', title: 'Citoyens engagés', desc: 'Approche-toi de 3 citoyens différents.' }
+    { id: 'city_citizens', type: 'meet_npc', target: 3, icon: '👋', title: 'Citoyens engagés', desc: 'Parle à 3 citoyens différents (touche Espace).' }
   ],
   aquatic: [
     { id: 'aquatic_poi', type: 'discover_poi', target: 3, icon: '✨', title: 'Mystères aquatiques', desc: 'Découvre les 3 orbes lumineux.' },
@@ -110,7 +110,7 @@ export const TUTORIAL_STEPS = [
   { icon: '🎮', title: 'Déplacement', text: 'WASD ou joystick (mobile) pour te déplacer.' },
   { icon: '📷', title: 'Caméra', text: 'Flèches ← → pour orbiter la caméra.' },
   { icon: '✨', title: 'Points lumineux', text: 'Approche-toi des orbes lumineux dispersés dans le monde.' },
-  { icon: '📖', title: 'Journal & badges', text: 'Espace pour interagir. E pour signaler un braconnier. M pour la carte. J pour le journal. 3 découvertes = 1 badge !' }
+  { icon: '📖', title: 'Journal & badges', text: 'Espace pour interagir. E pour signaler un braconnier. M pour la carte. J pour le journal. R pour te recentrer. 3 découvertes = 1 badge !' }
 ];
 
 export const GLTF_MODELS = {
@@ -118,8 +118,7 @@ export const GLTF_MODELS = {
   flamingo: 'https://threejs.org/examples/models/gltf/Flamingo.glb',
   parrot: 'https://threejs.org/examples/models/gltf/Parrot.glb',
   horse: 'https://threejs.org/examples/models/gltf/Horse.glb',
-  duck: 'https://threejs.org/examples/models/gltf/Duck.glb',
-  xbot: 'https://threejs.org/examples/models/gltf/Xbot.glb'
+  duck: 'https://threejs.org/examples/models/gltf/Duck.glb'
 };
 
 export const PLAYER_RADIUS = 0.45;

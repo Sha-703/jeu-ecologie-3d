@@ -72,6 +72,9 @@ window.selectCharacter = (id) => {
 };
 
 window.goToEnv = () => {
+  // Garantit un personnage visiblement sélectionné (défaut : mpanzu)
+  document.querySelector(`.charBtn[data-char="${profile.character}"]`)?.classList.add('selected');
+  saveProfile();
   showStep('stepEnv');
 };
 
@@ -94,7 +97,10 @@ window.resumeExperience = async () => {
   if (!profiles.hasSavedProfile()) return;
   applyProfileToUI();
   game.setProfile(profile);
-  showStep('stepEnv');
+  // Reprendre = redémarrer directement dans le dernier biome, pas juste l'écran de choix
+  document.getElementById('startScreen').classList.add('hidden');
+  document.getElementById('hud').style.display = 'block';
+  await game.start(profile.lastEnv || game.env.current || 'forest');
 };
 
 window.quitToEnvSelect = () => {
@@ -130,6 +136,11 @@ window.closeProfile = () => {
 
 window.disconnect = () => {
   localStorage.removeItem('ecoexplorer_profile');
+  // Déconnexion complète : le nouveau joueur ne doit pas hériter
+  // des badges, quêtes et entrées de journal du précédent
+  game.journal.reset();
+  game.quests.resetAll();
+  game.tutorial.forget();
   profile.name = '';
   profile.character = 'mpanzu';
   profile.lastEnv = 'forest';

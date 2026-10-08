@@ -37,4 +37,17 @@ export class TutorialSystem {
     document.getElementById('tutorialOverlay')?.classList.remove('visible');
     localStorage.setItem(STORAGE_KEY, '1');
   }
+
+  pause() {
+    // Quitter au menu : stoppe le défilement sans valider le tutoriel
+    if (this.timer) { clearInterval(this.timer); this.timer = null; }
+    document.getElementById('tutorialOverlay')?.classList.remove('visible');
+  }
+
+  forget() {
+    // Changement de joueur : le tutoriel sera rejoué
+    if (this.timer) { clearInterval(this.timer); this.timer = null; }
+    try { localStorage.removeItem(STORAGE_KEY); } catch {}
+    this.index = 0;
+  }
 }

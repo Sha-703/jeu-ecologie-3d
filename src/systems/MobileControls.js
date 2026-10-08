@@ -7,7 +7,8 @@ export class MobileControls {
 
     if (!this.active) return;
 
-    document.getElementById('mobileControls')?.classList.add('visible');
+    // Ne pas afficher les contrôles sur l'écran de connexion :
+    // Game.start() les montre quand la partie commence vraiment.
     document.getElementById('controlsHint')?.classList.add('hidden');
     this._setupJoystick();
   }

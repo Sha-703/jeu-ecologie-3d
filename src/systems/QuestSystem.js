@@ -13,10 +13,18 @@ export class QuestSystem {
 
   _load() {
     try {
-      return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-    } catch {
-      return {};
-    }
+      const d = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      if (d && typeof d === 'object' && !Array.isArray(d)) return d;
+    } catch {}
+    return {};
+  }
+
+  resetAll() {
+    this.progress = {};
+    this.metNpcs.clear();
+    this.swimDone = false;
+    this._save();
+    this.render();
   }
 
   _save() {

@@ -156,6 +156,13 @@ function randomGroundPos(spread) {
   return { x: (Math.random() - 0.5) * spread * 0.85, z: (Math.random() - 0.5) * spread * 0.85 };
 }
 
+// Cache des modèles GLTF par URL : le renard était téléchargé 8×, le flamant 6×…
+const gltfCache = new Map();
+async function loadGltfCached(loader, url) {
+  if (!gltfCache.has(url)) gltfCache.set(url, await loader.loadAsync(url));
+  return gltfCache.get(url);
+}
+
 export class AnimalSpawner {
   constructor(scene) {
     this.scene = scene;
@@ -243,7 +250,7 @@ export class AnimalSpawner {
   async _loadGltf(loader, cfg, getGroundHeight) {
     try {
       if (cfg.mode === 'fly') {
-        const gltf = await loader.loadAsync(cfg.url);
+        const gltf = await loadGltfCached(loader, cfg.url);
         const model = gltf.scene.clone();
         model.traverse(c => { if (c.isMesh) c.castShadow = true; });
         model.scale.setScalar(cfg.scale);
@@ -269,7 +276,7 @@ export class AnimalSpawner {
         return;
       }
 
-      const gltf = await loader.loadAsync(cfg.url);
+      const gltf = await loadGltfCached(loader, cfg.url);
       const model = gltf.scene.clone();
       model.traverse(c => { if (c.isMesh) c.castShadow = true; });
       model.scale.setScalar(cfg.scale);
@@ -300,7 +307,35 @@ export class AnimalSpawner {
         const fish = buildFish(cfg.color, cfg.accent, cfg.size);
         fish.position.set(cfg.cx, cfg.y, cfg.cz);
         this.group.add(fish);
-        this.swimmers.push({ mesh: fish, type: 'fish', cx: cfg.cx, cz: cfg.cz, radius: cfg.radius, angle: 0, speed: cfg.speed, y: cfg.y });
+        this.swimmers.push({ mesh: fish, type: 'fish', cx: cfg.cx, cz: cfg.cz, radius: cfg.radius, angle: Math.random() * Math.PI * 2, speed: cfg.speed, y: cfg.y });
+        continue;
+      }
+      if (cfg.kind === 'turtle') {
+        const turtle = buildTurtle();
+        turtle.position.set(cfg.cx, cfg.y, cfg.cz);
+        this.group.add(turtle);
+        this.swimmers.push({ mesh: turtle, type: 'turtle', cx: cfg.cx, cz: cfg.cz, radius: cfg.radius, angle: Math.random() * Math.PI * 2, speed: cfg.speed, y: cfg.y });
+        continue;
+      }
+      if (cfg.kind === 'frog') {
+        const pad = new THREE.Mesh(
+          new THREE.CircleGeometry(0.5, 10),
+          new THREE.MeshStandardMaterial({ color: 0x7fbf7f, roughness: 0.6, side: THREE.DoubleSide })
+        );
+        pad.rotation.x = -Math.PI / 2;
+        pad.position.set(cfg.x, 0.14, cfg.z);
+        this.group.add(pad);
+        const frog = buildFrog();
+        frog.position.set(cfg.x, 0.32, cfg.z);
+        this.group.add(frog);
+        this.swimmers.push({ mesh: frog, type: 'frog', baseY: 0.32, phase: Math.random() * Math.PI * 2 });
+        continue;
+      }
+      if (cfg.kind === 'dragonfly') {
+        const d = buildDragonfly();
+        d.position.set(cfg.cx, cfg.y, cfg.cz);
+        this.group.add(d);
+        this.swimmers.push({ mesh: d, type: 'dragonfly', cx: cfg.cx, cz: cfg.cz, radius: cfg.radius, angle: Math.random() * Math.PI * 2, speed: cfg.speed, y: cfg.y, phase: Math.random() * Math.PI * 2 });
       }
     }
     const loader = new GLTFLoader();
@@ -475,10 +510,25 @@ export class AnimalSpawner {
     }
 
     for (const s of this.swimmers) {
-      if (s.type === 'fish') {
+      if (s.type === 'fish' || s.type === 'turtle') {
         s.angle = (s.angle || 0) + s.speed * dt;
-        s.mesh.position.x = s.cx + Math.cos(s.angle) * s.radius;
-        s.mesh.position.z = s.cz + Math.sin(s.angle) * s.radius * 0.65;
+        const nx = s.cx + Math.cos(s.angle) * s.radius;
+        const nz = s.cz + Math.sin(s.angle) * s.radius * 0.65;
+        s.mesh.rotation.y = Math.atan2(nx - s.mesh.position.x, nz - s.mesh.position.z);
+        s.mesh.position.x = nx;
+        s.mesh.position.z = nz;
+        if (s.type === 'turtle') s.mesh.position.y = s.y + Math.sin(t * 1.5 + s.cx) * 0.05;
+      } else if (s.type === 'dragonfly') {
+        s.angle = (s.angle || 0) + s.speed * dt;
+        const nx = s.cx + Math.cos(s.angle) * s.radius;
+        const nz = s.cz + Math.sin(s.angle) * s.radius * 0.7;
+        s.mesh.rotation.y = Math.atan2(nx - s.mesh.position.x, nz - s.mesh.position.z);
+        s.mesh.position.x = nx;
+        s.mesh.position.z = nz;
+        s.mesh.position.y = s.y + Math.sin(t * 3 + s.phase) * 0.15;
+        s.mesh.userData.wings?.forEach(w => { w.rotation.y = Math.sin(t * 40 + s.phase) * 0.6; });
+      } else if (s.type === 'frog') {
+        s.mesh.position.y = s.baseY + Math.abs(Math.sin(t * 2 + s.phase)) * 0.08;
       }
     }
   }

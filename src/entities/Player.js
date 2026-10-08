@@ -14,7 +14,15 @@ export class Player {
 
   setCharacter(id) {
     this.characterId = id;
-    while (this.group.children.length) this.group.remove(this.group.children[0]);
+    while (this.group.children.length) {
+      const c = this.group.children[0];
+      this.group.remove(c);
+      c.traverse?.(o => {
+        o.geometry?.dispose?.();
+        const mats = Array.isArray(o.material) ? o.material : (o.material ? [o.material] : []);
+        mats.forEach(m => { m.map?.dispose?.(); m.dispose?.(); });
+      });
+    }
     this.charParts = null;
     const cfg = CHARACTERS[id] || CHARACTERS.mpanzu;
     if (cfg.gender === 'girl') this._buildNkenge(cfg);

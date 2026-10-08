@@ -622,8 +622,8 @@ export class NPCSpawner {
     if (nearest && nearestDist < NPC_NEAR_RADIUS) {
       const isPoacher = nearest.type === 'poacher';
       const isRanger = nearest.type === 'ranger';
-      if (nearest.type === 'civilian' && nearest.id) onNpcMet?.(nearest.id);
-      if (isRanger && nearest.id) onNpcMet?.(nearest.id);
+      // La quête "citoyens" exige de PARLER (Espace), pas juste passer à côté :
+      // onNpcMet n'est déclenché que dans tryTalk(), pas ici par proximité.
       let text = isPoacher ? NPC_MESSAGES.poacher : isRanger ? NPC_MESSAGES.ranger : `👋 ${nearest.label} — Appuie sur Espace pour parler !`;
       if (isPoacher && nearest.aiState === 'chase') {
         text = '🏃 Braconnier en train de poursuivre un animal !';

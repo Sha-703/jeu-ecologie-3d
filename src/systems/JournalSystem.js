@@ -10,10 +10,16 @@ export class JournalSystem {
 
   _load() {
     try {
-      return JSON.parse(localStorage.getItem(STORAGE_KEY)) || { badges: [], entries: [] };
-    } catch {
-      return { badges: [], entries: [] };
-    }
+      const d = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      if (d && Array.isArray(d.badges) && Array.isArray(d.entries)) return d;
+    } catch {}
+    return { badges: [], entries: [] };
+  }
+
+  reset() {
+    this.data = { badges: [], entries: [] };
+    this._save();
+    this.render();
   }
 
   _save() {

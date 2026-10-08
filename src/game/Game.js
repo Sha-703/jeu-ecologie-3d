@@ -17,6 +17,14 @@ import { AnimalSpawner } from '../entities/AnimalSpawner.js';
 import { NPCSpawner } from '../entities/NPCSpawner.js';
 import { buildEnvironment, buildMapBoundary } from '../environments/EnvironmentBuilder.js';
 
+function disposeGroup(root) {
+  root?.traverse?.(o => {
+    o.geometry?.dispose?.();
+    const mats = Array.isArray(o.material) ? o.material : (o.material ? [o.material] : []);
+    mats.forEach(m => { m.map?.dispose?.(); m.dispose?.(); });
+  });
+}
+
 export class Game {
   constructor() {
     this.env = { current: 'forest', name: 'Forêt' };
@@ -73,7 +81,7 @@ export class Game {
     }
     this.loadEnvironment(envName);
     this.audio.init();
-    this.audio.start(envName);
+    // (loadEnvironment démarre déjà l'audio du biome — pas de double start)
     this.tutorial.maybeShow();
     this.journal.render();
     this._updateBadgeDisplay();
@@ -87,6 +95,7 @@ export class Game {
     this.keys = {};
     this.isWalking = false;
     this.audio.stop();
+    this.tutorial.pause();
     if (this.poi?.modalOpen) this.poi.closeModal();
     document.getElementById('journalPanel')?.classList.remove('visible');
     document.getElementById('tutorialOverlay')?.classList.remove('visible');
@@ -195,8 +204,8 @@ export class Game {
     this.camera.far = 2000;
     this.camera.updateProjectionMatrix();
 
-    if (this.envMesh) this.scene.remove(this.envMesh);
-    if (this.boundaryGroup) { this.scene.remove(this.boundaryGroup); this.boundaryGroup = null; }
+    if (this.envMesh) { this.scene.remove(this.envMesh); disposeGroup(this.envMesh); }
+    if (this.boundaryGroup) { this.scene.remove(this.boundaryGroup); disposeGroup(this.boundaryGroup); this.boundaryGroup = null; }
 
     this.envMesh = new THREE.Group();
     this.scene.add(this.envMesh);
@@ -228,6 +237,7 @@ export class Game {
     this.particles.build(name);
     this.weather.build(name);
     this.weather.applyFog(this.scene, this.baseFog);
+    this.dayNight.setFogBase(this.scene.fog.color.getHex());
     this.animals.spawn(name, (x, z) => this.getGroundHeight(x, z), {
       lakeRadius: this.lakeRadius,
       spread: cfg.spread
@@ -294,8 +304,10 @@ export class Game {
 
   _buildUI() {
     const data = ECO_DATA[this.env.current] || ECO_DATA.forest;
-    const fact = data[0];
-    document.getElementById('ecoFact1').innerHTML = `<strong>${fact.title}</strong><span>${fact.desc}</span>`;
+    const fact1 = data[0], fact2 = data[1];
+    document.getElementById('ecoFact1').innerHTML = `<strong>${fact1.title}</strong><span>${fact1.desc}</span>`;
+    const fact2El = document.getElementById('ecoFact2');
+    if (fact2El) fact2El.innerHTML = fact2 ? `<strong>${fact2.title}</strong><span>${fact2.desc}</span>` : '';
     const weather = this.weather?.getFact();
     const wTitle = document.getElementById('weatherTitle');
     const wFact = document.getElementById('weatherFact');
@@ -307,6 +319,10 @@ export class Game {
 
   _bindInput() {
     window.addEventListener('keydown', e => {
+      // Ignore les touches tapées dans un champ (ex. prénom) pour ne pas
+      // déclencher les raccourcis du jeu (J = journal, M = carte, R = reset…)
+      const tag = e.target?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
       const c = e.key.toLowerCase();
       if (['w', 'a', 's', 'd', 'e', 'm', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '].includes(c)) {
         e.preventDefault();

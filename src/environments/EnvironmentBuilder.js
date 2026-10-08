@@ -336,11 +336,11 @@ export function buildEnvironment(name, ctx) {
     const buildMat = new THREE.MeshStandardMaterial({ color: 0x37474f, roughness: 0.5 });
     const windowMat = new THREE.MeshStandardMaterial({ color: 0xfff176, emissive: 0xfff176, emissiveIntensity: 0.12 });
     for (let i = 0; i < 45; i++) {
+      const wx = (Math.random() - 0.5) * spread, wz = (Math.random() - 0.5) * spread;
+      if (Math.abs(wx % 45) < 5 || Math.abs(wz % 45) < 5) continue;
       const b = new THREE.Group();
       const w = 2 + Math.random() * 3, d = 2 + Math.random() * 3, h = 3 + Math.random() * 10;
       b.add(new THREE.Mesh(new THREE.BoxGeometry(w, h, d), buildMat));
-      const wx = (Math.random() - 0.5) * spread, wz = (Math.random() - 0.5) * spread;
-      if (Math.abs(wx % 45) < 5 || Math.abs(wz % 45) < 5) continue;
       b.position.set(wx, h / 2, wz);
       b.rotation.y = Math.random() * Math.PI * 2;
       envMesh.add(b);
